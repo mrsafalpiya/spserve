@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ .Name }} - spserve</title>
+    <style>
+      :root {
+        --COL-BG: #000000;
+        --COL-FG: #bcbcbc;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: content-box;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      body {
+        background-color: var(--COL-BG);
+        color: var(--COL-FG);
+        font-family: Arial, Helvetica, sans-serif;
+        max-width: 800px;
+        margin: 0.5rem auto;
+        padding: 0 0.5rem;
+      }
+
+      main {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .files-list {
+        list-style: none;
+      }
+
+      .files-list li {
+        background-color: #111;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .files-list li a {
+        display: block;
+        padding: 0.5rem;
+        flex-basis: 100%;
+      }
+
+      .files-list li:not(:last-child) {
+        margin-bottom: 0.75rem;
+      }
+
+      .files-list li button {
+        background: transparent;
+        padding: 0 0.5rem;
+        cursor: pointer;
+        border: none;
+        color: green;
+        font-size: 1rem;
+      }
+
+      .requires-js {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>{{ .Name }}</h1>
+      <div class="files-container">
+        <ul class="files-list">
+          {{ if not .IsRoot }}
+          <li>
+            <a href="..">📁 ..</a>
+          </li>
+          {{ end }} {{ range .Dirs }}
+          <li>
+            <a href="{{ .Location }}/">📁 {{ .Name }}</a>
+          </li>
+          {{ end }} {{ range .RegFiles }}
+          <li>
+            <a href="{{ .Location }}">{{ .Name }}</a>
+            <button class="requires-js copy-link">🔗</button>
+          </li>
+          {{ end }}
+        </ul>
+      </div>
+    </main>
+    <script type="text/javascript">
+      // Show elements requiring JavaScript
+      let requiresJSElements = document.getElementsByClassName("requires-js");
+      Array.from(requiresJSElements).forEach((element) => {
+        element.style.display = "unset";
+      });
+
+      // Copy to clipboard
+      function unsecuredCopyToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.focus({ preventScroll: true });
+        textArea.select();
+        try {
+          document.execCommand("copy");
+        } catch (err) {
+          console.error("Unable to copy to clipboard", err);
+        }
+        document.body.removeChild(textArea);
+      }
+
+      let copyLinkBtns = document.getElementsByClassName("copy-link");
+      Array.from(copyLinkBtns).forEach((element) => {
+          element.addEventListener("click", function () {
+            let link =
+              window.location.href +
+              encodeURI(element.previousElementSibling.innerText);
+            if (navigator.clipboard) {
+              console.log("Using clipboard API");
+              navigator.clipboard.writeText(link);
+            } else {
+              console.log("Using insecure clipboard function");
+              unsecuredCopyToClipboard(link);
+            }
+
+            Array.from(copyLinkBtns).forEach((element) => {
+              element.innerText = "🔗";
+              element.style.fontSize = "1rem";
+            });
+            element.innerText = "✓";
+            element.style.fontSize = "1.5rem";
+          });
+      });
+    </script>
+  </body>
+</html>

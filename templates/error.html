@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ .StatusCode }} - {{ .StatusMessage }}</title>
+    <style>
+      :root {
+        --COL-BG: #000000;
+        --COL-FG: #bcbcbc;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: content-box;
+      }
+
+      body {
+        background-color: var(--COL-BG);
+        color: var(--COL-FG);
+        font-family: Arial, Helvetica, sans-serif;
+        max-width: 800px;
+        margin: 0.5rem auto;
+        padding: 0 0.5rem;
+      }
+
+      .status-header {
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <center>
+        <h1 class="status-header">{{ .StatusCode }} - {{ .StatusMessage }}</h1>
+        <p>{{ .Message }}</p>
+      </center>
+    </main>
+  </body>
+</html>
