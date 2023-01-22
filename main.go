@@ -70,10 +70,10 @@ type FileEntry struct {
 // Server
 // ------
 
-func getMyInterfaceAddr() (net.IP, error) {
+func getMyInterfaceAddrStr() (string, error) {
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	addresses := []net.IP{}
 	for _, iface := range ifaces {
@@ -108,9 +108,9 @@ func getMyInterfaceAddr() (net.IP, error) {
 		}
 	}
 	if len(addresses) == 0 {
-		return nil, fmt.Errorf("no address Found, net.InterfaceAddrs: %v", addresses)
+		return "", fmt.Errorf("No address found")
 	}
-	return addresses[0], nil
+	return addresses[0].String(), nil
 }
 
 func serveFile(w http.ResponseWriter, r *http.Request) {
@@ -236,11 +236,11 @@ func initVariables() {
 		log.Fatalf("[ERROR] Couldn't set root path: %s", err)
 	}
 
-	interfaceAddr, err := getMyInterfaceAddr()
+	interfaceAddr, err := getMyInterfaceAddrStr()
 	if err != nil {
 		log.Fatalf("[ERROR] Couldn't get network interface address: %s", err)
 	}
-	serverIP = interfaceAddr.String()
+	serverIP = interfaceAddr
 }
 
 func executeTemplates() {
