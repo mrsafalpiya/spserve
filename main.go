@@ -234,7 +234,13 @@ func usage() {
 
 func parseArgs() {
 	flag.IntVar(&serverPort, "port", 8080, "Port for the server to listen")
+	toPrintHelp := flag.Bool("h", false, "Print help message")
 	flag.Parse()
+
+	if *toPrintHelp {
+		usage()
+		os.Exit(0)
+	}
 }
 
 func getRootPathCleaned(root string) (string, error) {
