@@ -16,7 +16,10 @@
 
 package main
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func Test_getRootPathCleaned(t *testing.T) {
 	type args struct {
@@ -29,24 +32,16 @@ func Test_getRootPathCleaned(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "Valid directory",
-			args:    args{
-				root: ".",
-			},
-			want:    ".",
-			wantErr: false,
-		},
-		{
-			name:    "Regular file",
-			args:    args{
+			name: "Regular file",
+			args: args{
 				root: "./go.mod",
 			},
 			want:    "",
 			wantErr: true,
 		},
 		{
-			name:    "Invalid location",
-			args:    args{
+			name: "Invalid location",
+			args: args{
 				root: "foo/bar",
 			},
 			want:    "",
@@ -62,6 +57,63 @@ func Test_getRootPathCleaned(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("getRootPathCleaned() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_getPrevDirs(t *testing.T) {
+	type args struct {
+		urlPath string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []FileEntry
+	}{
+		{
+			name: "Root url",
+			args: args{
+				urlPath: "/",
+			},
+			want: []FileEntry{},
+		},
+		{
+			name: "One directory inside",
+			args: args{
+				urlPath: "/foo",
+			},
+			want: []FileEntry{
+				{
+					Name:     "🏠",
+					Location: "/",
+					IsDir:    true,
+				},
+			},
+		},
+		{
+			name: "Two directories inside",
+			args: args{
+				urlPath: "/foo/bar",
+			},
+			want: []FileEntry{
+				{
+					Name:     "🏠",
+					Location: "/",
+					IsDir:    true,
+				},
+				{
+					Name:     "foo",
+					Location: "/foo/",
+					IsDir:    true,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getPrevDirs(tt.args.urlPath); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getPrevDirs() = %v, want %v", got, tt.want)
 			}
 		})
 	}

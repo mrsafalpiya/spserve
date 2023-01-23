@@ -28,6 +28,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 // Server variables
@@ -113,8 +114,38 @@ func getMyInterfaceAddrStr() (string, error) {
 	return addresses[0].String(), nil
 }
 
+func getPrevDirs(urlPath string) []FileEntry {
+	if urlPath == "/" {
+		return []FileEntry{}
+	}
+
+	prevDirsList := strings.Split(urlPath, "/")
+	var prevDirs []FileEntry = []FileEntry{
+		{
+			Name:     "🏠",
+			Location: "/",
+			IsDir:    true,
+		},
+	}
+	for i := 1; i < len(prevDirsList)-1; i++ {
+		loc := "/"
+		for j := 0; j < i; j++ {
+			loc += prevDirsList[j+1] + "/"
+		}
+
+		prevDirs = append(prevDirs, FileEntry{
+			Name:     prevDirsList[i],
+			Location: loc,
+			IsDir:    true,
+		})
+	}
+
+	return prevDirs
+}
+
 func serveFile(w http.ResponseWriter, r *http.Request) {
-	reqFilePath := filepath.Join(rootPath, r.URL.Path)
+	urlPath := filepath.Clean(r.URL.Path)
+	reqFilePath := filepath.Join(rootPath, urlPath)
 	log.Println(reqFilePath)
 
 	info, err := os.Open(reqFilePath)
@@ -152,9 +183,11 @@ func serveFile(w http.ResponseWriter, r *http.Request) {
 
 	// If the file requested is a directory
 	dirEntry := DirEntry{
-		Name:   stat.Name(),
-		IsRoot: r.URL.Path == "/",
+		Name:     stat.Name(),
+		PrevDirs: getPrevDirs(urlPath),
+		IsRoot:   urlPath == "/",
 	}
+
 	files, err := info.Readdir(0)
 	if err != nil {
 		errTmpl.Execute(w, Response{

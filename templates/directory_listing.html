@@ -36,6 +36,14 @@
         gap: 1rem;
       }
 
+      .dir-name {
+        display: inline-block;
+      }
+
+      .dir-name a {
+        color: #FE4F00;
+      }
+
       .files-list {
         list-style: none;
       }
@@ -72,7 +80,12 @@
   </head>
   <body>
     <main>
-      <h1>{{ .Name }}</h1>
+      <div>
+        {{ range .PrevDirs }}
+        <h1 class="dir-name"><a href="{{ .Location }}">{{ .Name }}</a> ➧ </h1>
+        {{ end }}
+        <h1 class="dir-name">{{ .Name }}</h1>
+      </div>
       <div class="files-container">
         <ul class="files-list">
           {{ if not .IsRoot }}
@@ -116,25 +129,25 @@
 
       let copyLinkBtns = document.getElementsByClassName("copy-link");
       Array.from(copyLinkBtns).forEach((element) => {
-          element.addEventListener("click", function () {
-            let link =
-              window.location.href +
-              encodeURI(element.previousElementSibling.innerText);
-            if (navigator.clipboard) {
-              console.log("Using clipboard API");
-              navigator.clipboard.writeText(link);
-            } else {
-              console.log("Using insecure clipboard function");
-              unsecuredCopyToClipboard(link);
-            }
+        element.addEventListener("click", function () {
+          let link =
+            window.location.href +
+            encodeURI(element.previousElementSibling.innerText);
+          if (navigator.clipboard) {
+            console.log("Using clipboard API");
+            navigator.clipboard.writeText(link);
+          } else {
+            console.log("Using insecure clipboard function");
+            unsecuredCopyToClipboard(link);
+          }
 
-            Array.from(copyLinkBtns).forEach((element) => {
-              element.innerText = "🔗";
-              element.style.fontSize = "1rem";
-            });
-            element.innerText = "✓";
-            element.style.fontSize = "1.5rem";
+          Array.from(copyLinkBtns).forEach((element) => {
+            element.innerText = "🔗";
+            element.style.fontSize = "1rem";
           });
+          element.innerText = "✓";
+          element.style.fontSize = "1.5rem";
+        });
       });
     </script>
   </body>
