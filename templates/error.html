@@ -28,6 +28,10 @@
       .status-header {
         margin-bottom: 1rem;
       }
+
+      a {
+        color: inherit;
+      }
     </style>
   </head>
   <body>
@@ -35,6 +39,8 @@
       <center>
         <h1 class="status-header">{{ .StatusCode }} - {{ .StatusMessage }}</h1>
         <p>{{ .Message }}</p>
+        <br />
+        <p>Go to <a href="/">Home</a></p>
       </center>
     </main>
   </body>
